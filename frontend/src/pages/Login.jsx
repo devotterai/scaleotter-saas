@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../context/AuthContext';
 import { Loader2, Mail, Lock, AlertCircle } from 'lucide-react';
 
 export function Login() {
@@ -7,6 +9,15 @@ export function Login() {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
+    const { session } = useAuth();
+
+    // Redirect to dashboard once session is established
+    useEffect(() => {
+        if (session) {
+            navigate('/', { replace: true });
+        }
+    }, [session, navigate]);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -22,7 +33,7 @@ export function Login() {
             setError(error.message);
             setLoading(false);
         }
-        // If successful, AuthContext listener will pick it up and update the session
+        // AuthContext will update session, triggering the useEffect redirect above
     };
 
     return (
